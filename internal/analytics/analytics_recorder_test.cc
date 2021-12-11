@@ -20,11 +20,11 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "absl/time/time.h"
-#include "analytics/connection_attempt_metadata_params.h"
 #include "platform/base/error_code_params.h"
 #include "platform/base/error_code_recorder.h"
 #include "platform/public/count_down_latch.h"
 #include "platform/public/logging.h"
+#include "analytics/connection_attempt_metadata_params.h"
 #include "proto/analytics/connections_log.pb.h"
 #include "proto/connections_enums.pb.h"
 
