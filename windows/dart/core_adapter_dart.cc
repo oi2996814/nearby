@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
+
 #include "third_party/dart_lang/v2/runtime/include/dart_api_dl.h"
 #include "third_party/dart_lang/v2/runtime/include/dart_native_api.h"
 #include "core/core.h"
@@ -471,10 +473,37 @@ void SendPayloadDart(Core *pCore, const char *endpoint_id,
   ResultCallback callback;
   std::vector<string> endpoint_ids = {string(endpoint_id)};
 
-  Payload payload(Payload::GenerateId(), ByteArray(payload_dart.data));
-  SetResultCallback(callback, result_cb);
-  SendPayload(pCore, absl::Span<const std::string>(endpoint_ids),
-              std::move(payload), callback);
+  NEARBY_LOG(INFO, "Payload type: =%d", payload_dart.type);
+  switch (payload_dart.type) {
+    case UNKNOWN:
+    case STREAM:
+      NEARBY_LOG(INFO, "Payload type not supported yet");
+      break;
+    case BYTE: {
+      Payload payload(Payload::GenerateId(), ByteArray(payload_dart.data));
+      SendPayload(pCore, absl::Span<const std::string>(endpoint_ids),
+                  std::move(payload), callback);
+    }
+      SetResultCallback(callback, result_cb);
+      break;
+    case FILE:
+      NEARBY_LOG(INFO, "File name: =%s", payload_dart.data);
+      std::string send_file(payload_dart.data);
+
+      location::nearby::InputFile input_file{send_file.c_str()};
+
+      auto pivot = send_file.find_last_of('\\');
+      auto file_name = send_file.substr(pivot + 1);
+      auto parent_folder = send_file.substr(0, pivot);
+      {
+        Payload payload{parent_folder.c_str(), file_name.c_str(),
+                        std::move(input_file)};
+        SendPayload(pCore, absl::Span<const std::string>(endpoint_ids),
+                    std::move(payload), callback);
+      }
+      SetResultCallback(callback, result_cb);
+      break;
+  }
 }
 }  // namespace windows
 }  // namespace connections
