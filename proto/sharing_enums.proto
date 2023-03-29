@@ -16,23 +16,25 @@ syntax = "proto2";
 
 package location.nearby.proto.sharing;
 
+// import "logs/proto/logs_annotations/logs_annotations.proto";
 
-
-
+// option (logs_proto.file_not_used_for_logging_except_enums) = true;
 option optimize_for = LITE_RUNTIME;
 option java_package = "com.google.location.nearby.proto";
 option java_outer_classname = "SharingEnums";
 option objc_class_prefix = "GNSHP";
 
-/*
-We use event based logging (an event object can be constructed and logged
-immediately when they occur). To obtain session based information (e.g.
-durations, counting incoming introductions), we use flowId (sender/receiver) in
-NearbyClearcutLogger for all events (may exclude settings), and session_id for a
-pair of events (start and end of a session).
- */
+// We use event based logging (an event object can be constructed and logged
+// immediately when they occur). To obtain session based information (e.g.
+// durations, counting incoming introductions), we use flowId (sender/receiver)
+// in NearbyClearcutLogger (for android, or clearcut_event_logger as the
+// equivalence for Windows) for all events (may exclude settings), and
+// session_id for a pair of events (start and end of a session).
+// Next id: 58
 enum EventType {
   UNKNOWN_EVENT_TYPE = 0;
+
+  // LINT.IfChange(EventType)
 
   // When new users accept agreements (like grant permission to contacts for
   // CONTACT_ONLY visibility) and are enrolled into Nearby Sharing. This event
@@ -154,6 +156,9 @@ enum EventType {
   // Receiver phone consent clicked.
   LAUNCH_PHONE_CONSENT = 38;
 
+  // Devices show a phone consent banner in Nearby Share Settings
+  DISPLAY_PHONE_CONSENT = 54;
+
   // Receiver taps quick settings tile.
   TAP_QUICK_SETTINGS_TILE = 39;
 
@@ -188,6 +193,31 @@ enum EventType {
 
   // Track device states in Nearby Share setting.
   DEVICE_SETTINGS = 49;
+
+  // Receiver auto dismisses a fast initialization notification.
+  AUTO_DISMISS_FAST_INITIALIZATION = 50;
+
+  // App Crash event.
+  // Used only for Windows App now.
+  APP_CRASH = 51;
+
+  // Sender taps the Send button in quick settings
+  TAP_QUICK_SETTINGS_FILE_SHARE = 52;
+
+  // Devices show a privacy notification
+  DISPLAY_PRIVACY_NOTIFICATION = 53;
+
+  // Preference usage event (e.g. load/save preferences, etc).
+  // Used only for Windows App now.
+  PREFERENCES_USAGE = 55;
+
+  // Default opt in
+  DEFAULT_OPT_IN = 56;
+
+  // The result of the setup wizard flow
+  SETUP_WIZARD = 57;
+
+  // LINT.ThenChange(//depot/google3/location/nearby/proto/nearby_event_codes.proto:SharingEventCode)
 }
 
 // Event category to differentiate whether this comes from sender or receiver,
@@ -214,6 +244,7 @@ enum Visibility {
   EVERYONE = 2;
   SELECTED_CONTACTS_ONLY = 3;
   HIDDEN = 4;
+  SELF_SHARE = 5;
 }
 
 enum DataUsage {
@@ -307,6 +338,7 @@ enum OSType {
   ANDROID = 1;
   CHROME_OS = 2;
   IOS = 3;
+  WINDOWS = 4;
 }
 
 // Relationship of remote device to sender device.
@@ -338,6 +370,8 @@ enum LogSource {
   OEM_DEVICES = 4;
   // Represents the device for debugging.
   DEBUG_DEVICES = 5;
+  // Represents the device for Nearby Module Food.
+  NEARBY_MODULE_FOOD_DEVICES = 6;
 }
 
 // The Fast Share server action name.
@@ -351,6 +385,9 @@ enum ServerActionName {
   UPDATE_DEVICE_NAME = 5;
   UPLOAD_SENDER_CERTIFICATES = 6;
   DOWNLOAD_SENDER_CERTIFICATES = 7;
+  UPLOAD_CONTACTS_AND_CERTIFICATES = 8;
+  LIST_REACHABLE_PHONE_NUMBERS = 9;
+  LIST_MY_DEVICES = 10;
 }
 
 // The Fast Share server response state.
@@ -370,15 +407,27 @@ enum ServerResponseState {
 
   // For GoogleAuthException.
   SERVER_RESPONSE_GOOGLE_AUTH_FAILURE = 8;
+
+  // For Internet connect status.
+  SERVER_RESPONSE_NOT_CONNECTED_TO_INTERNET = 10;
 }
 
 // The type of Nearby Sharing scanning.
 enum ScanType {
   UNKNOWN_SCAN_TYPE = 0;
-
   FOREGROUND_SCAN = 1;
   FOREGROUND_RETRY_SCAN = 2;
   DIRECT_SHARE_SCAN = 3;
+  BACKGROUND_SCAN = 4;
+}
+
+// The Nearby Sharing advertising mode.
+enum AdvertisingMode {
+  UNKNOWN_ADVERTISING_MODE = 0;
+  SCREEN_OFF_ADVERTISING_MODE = 1;
+  BACKGROUND_ADVERTISING_MODE = 2;
+  MIDGROUND_ADVERTISING_MODE = 3;
+  FOREGROUND_ADVERTISING_MODE = 4;
 }
 
 // The class name of chimera activity.
@@ -393,6 +442,8 @@ enum ActivityName {
   CONSENTS_ACTIVITY = 6;
   SET_DEVICE_NAME_DIALOG = 7;
   SET_DATA_USAGE_DIALOG = 8;
+  QUICK_SETTINGS_ACTIVITY = 9;
+  REMOTE_COPY_SHARE_SHEET_ACTIVITY = 10;
 }
 
 // The type of consent page user launches.
@@ -460,4 +511,61 @@ enum PermissionRequestType {
   PERMISSION_WIFI = 2;
   PERMISSION_BLUETOOTH = 3;
   PERMISSION_LOCATION = 4;
+}
+
+enum SharingUseCase {
+  USE_CASE_UNKNOWN = 0;
+
+  USE_CASE_NEARBY_SHARE = 1;
+  USE_CASE_REMOTE_COPY_PASTE = 2;
+  USE_CASE_WIFI_CREDENTIAL = 3;
+  USE_CASE_APP_SHARE = 4;
+  USE_CASE_QUICK_SETTING_FILE_SHARE = 5;
+  USE_CASE_SETUP_WIZARD = 6;
+}
+
+// Used only for Windows App now.
+enum AppCrashReason {
+  APP_CRASH_REASON_UNKNOWN = 0;
+}
+
+// Thes source where the attachemnt comes from. It can be an action, app name,
+// etc. The first 6 source types are being used as FileSenderType in Nearby
+// Share Windows app.
+enum AttachmentSourceType {
+  ATTACHMENT_SOURCE_UNKNOWN = 0;
+  ATTACHMENT_SOURCE_CONTEXT_MENU = 1;
+  ATTACHMENT_SOURCE_DRAG_AND_DROP = 2;
+  ATTACHMENT_SOURCE_SELECT_FILES_BUTTON = 3;
+  ATTACHMENT_SOURCE_PASTE = 4;
+  ATTACHMENT_SOURCE_SELECT_FOLDERS_BUTTON = 5;
+}
+
+// The action to interact with preferences.
+// Used only for Windows App now.
+enum PreferencesAction {
+  PREFERENCES_ACTION_UNKNOWN = 0;
+  PREFERENCES_ACTION_NO_ACTION = 1;
+
+  // Primary actions/functions towards preferences
+  PREFERENCES_ACTION_LOAD_PREFERENCES = 2;
+  PREFERENCES_ACTION_SAVE_PREFERENCESS = 3;
+  PREFERENCES_ACTION_ATTEMPT_LOAD = 4;
+  PREFERENCES_ACTION_RESTORE_FROM_BACKUP = 5;
+
+  // Other actions within the 4 actions above
+  PREFERENCES_ACTION_CREATE_PREFERENCES_PATH = 6;
+  PREFERENCES_ACTION_MAKE_PREFERENCES_BACKUP_FILE = 7;
+  PREFERENCES_ACTION_CHECK_IF_PREFERENCES_PATH_EXISTS = 8;
+  PREFERENCES_ACTION_CHECK_IF_PREFERENCES_INPUT_STREAM_STATUS = 9;
+  PREFERENCES_ACTION_CHECK_IF_PREFERENCES_FILE_IS_CORRUPTED = 10;
+  PREFERENCES_ACTION_CHECK_IF_PREFERENCES_BACKUP_FILE_EXISTS = 11;
+}
+
+// The status of the action to interact with preferences.
+// Used only for Windows App now.
+enum PreferencesActionStatus {
+  PREFERENCES_ACTION_STATUS_UNKNOWN = 0;
+  PREFERENCES_ACTION_STATUS_SUCCESS = 1;
+  PREFERENCES_ACTION_STATUS_FAIL = 2;
 }

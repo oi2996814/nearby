@@ -14,7 +14,7 @@
 
 # Proto for Nearby products
 
-load("//net/proto2/contrib/portable/cc:portable_proto_build_defs.bzl", "portable_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 
 licenses(["notice"])
 
@@ -23,21 +23,6 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "connections_enums_proto",
     srcs = ["connections_enums.proto"],
-    cc_api_version = 2,
-    compatible_with = ["//buildenv/target:non_prod"],
-    deps = [
-        "//logs/proto/logs_annotations",
-    ],
-)
-
-java_lite_proto_library(
-    name = "connections_enums_java_proto_lite",
-    deps = [":connections_enums_proto"],
-)
-
-go_proto_library(
-    name = "connections_enums_go_proto",
-    deps = [":connections_enums_proto"],
 )
 
 java_proto_library(
@@ -45,47 +30,39 @@ java_proto_library(
     deps = [":connections_enums_proto"],
 )
 
-portable_proto_library(
-    name = "connections_enums_portable_proto",
-    compatible_with = [
-        "//buildenv/target:non_prod",
-    ],
-    config = ":connections_enums_proto_config",
-    copts = [
-        "-DGOOGLE_PROTOBUF_NO_RTTI=1",
-    ],
-    header_outs = [
-        "connections_enums.pb.h",
-    ],
-    proto_deps = [
-        ":connections_enums_proto",
-    ],
-    visibility = [
-        "//location/nearby/connections:__subpackages__",
-        "//third_party/nearby:__subpackages__",
-    ],
-)
-
-filegroup(
-    name = "connections_enums_proto_config",
-    srcs = ["connections_enums_proto_config.asciipb"],
-    compatible_with = [
-        "//buildenv/target:non_prod",
-    ],
+cc_proto_library(
+    name = "connections_enums_cc_proto",
+    deps = [":connections_enums_proto"],
 )
 
 proto_library(
     name = "sharing_enums_proto",
     srcs = ["sharing_enums.proto"],
-    cc_api_version = 2,
-    compatible_with = ["//buildenv/target:non_prod"],
-    deps = [
-        "//logs/proto/logs_annotations",
-    ],
 )
 
-java_lite_proto_library(
-    name = "sharing_enums_java_proto_lite",
+proto_library(
+    name = "fast_pair_enums_proto",
+    srcs = ["fast_pair_enums.proto"],
+    compatible_with = ["//buildenv/target:non_prod"],
+)
+
+cc_proto_library(
+    name = "fast_pair_enums_cc_proto",
+    deps = [":fast_pair_enums_proto"],
+)
+
+java_proto_library(
+    name = "fast_pair_enums_java_proto",
+    deps = [":fast_pair_enums_proto"],
+)
+
+cc_proto_library(
+    name = "sharing_enums_cc_proto",
+    visibility = [
+        "//:__subpackages__",
+        "//location/nearby/analytics/cpp/logging:__subpackages__",
+        "//location/nearby/cpp/sharing:__subpackages__",
+    ],
     deps = [":sharing_enums_proto"],
 )
 

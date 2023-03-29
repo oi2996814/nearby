@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("//net/proto2/contrib/portable/cc:portable_proto_build_defs.bzl", "portable_proto_library")
-load("//tools/build_defs/proto/cpp:cc_proto_library.bzl", "cc_proto_library")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
+    name = "multiplex_frames_proto",
+    srcs = [
+        "multiplex_frames.proto",
+    ],
+)
+
+proto_library(
     name = "nfc_frames_proto",
     srcs = [
         "nfc_frames.proto",
     ],
-    cc_api_version = 2,
-)
-
-java_lite_proto_library(
-    name = "nfc_frames_java_proto_lite",
-    visibility = ["//java/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__"],
-    deps = [":nfc_frames_proto"],
 )
 
 proto_library(
@@ -38,33 +37,6 @@ proto_library(
     srcs = [
         "wifi_aware_frames.proto",
     ],
-    cc_api_version = 2,
-)
-
-java_lite_proto_library(
-    name = "wifi_aware_frames_java_proto_lite",
-    visibility = [
-        "//java/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__",
-        "//javatests/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__",
-    ],
-    deps = [":wifi_aware_frames_proto"],
-)
-
-proto_library(
-    name = "ble_frames_proto",
-    srcs = [
-        "ble_frames.proto",
-    ],
-    cc_api_version = 2,
-)
-
-java_lite_proto_library(
-    name = "ble_frames_java_proto_lite",
-    visibility = [
-        "//java/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__",
-        "//javatests/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__",
-    ],
-    deps = [":ble_frames_proto"],
 )
 
 proto_library(
@@ -72,48 +44,24 @@ proto_library(
     srcs = [
         "web_rtc_signaling_frames.proto",
     ],
-    cc_api_version = 2,
-    compatible_with = [
-        "//buildenv/target:non_prod",
-    ],
 )
 
 cc_proto_library(
     name = "web_rtc_signaling_frames_cc_proto",
-    compatible_with = [
-        "//buildenv/target:non_prod",
-    ],
-    visibility = [
-        "//location/nearby/connections:__subpackages__",
-        "//third_party/nearby:__subpackages__",
-    ],
+    visibility = ["//:__subpackages__"],
     deps = [":web_rtc_signaling_frames_proto"],
 )
 
-java_lite_proto_library(
-    name = "web_rtc_signaling_frames_java_proto_lite",
-    visibility = [
-        "//java/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__",
-        "//javatests/com/google/android/gmscore/integ/modules/nearby/src/com/google/android/gms/nearby/mediums:__subpackages__",
+proto_library(
+    name = "ble_frames_proto",
+    srcs = [
+        "ble_frames.proto",
     ],
-    deps = [":web_rtc_signaling_frames_proto"],
 )
 
-portable_proto_library(
-    name = "ble_frames_portable_proto",
-    config = ":ble_frames_portable_proto_config",
-    copts = [
-        "-DGOOGLE_PROTOBUF_NO_RTTI=1",
-    ],
-    header_outs = [
-        "ble_frames.pb.h",
-    ],
-    proto_deps = [
+cc_proto_library(
+    name = "ble_frames_cc_proto",
+    deps = [
         ":ble_frames_proto",
     ],
-)
-
-filegroup(
-    name = "ble_frames_portable_proto_config",
-    srcs = ["ble_frames_portable_proto_config.asciipb"],
 )
